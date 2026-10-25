@@ -36,7 +36,8 @@ host validates and commits contested writes), `local` (never shared).
 | Containers | open and close, contents (a slice of the host's object stack) | presser; host for contents | snapshot | works, two known breaks |
 | NPCs | spawn, despawn, pose, state for the generic creatures | host | snapshot | works |
 | Kerfur | the prop-to-NPC conversion cycle, per-kerfur skins | host | snapshot plus adoption | works |
-| Owner-entity creatures | a creature whose AI reads the local player is owned per peer and mirrored to the rest | peer | keepalive | built |
+| Owner-entity creatures | a creature whose AI reads the local player, and the mannequin and jump-scare characters a trigger spawns, owned per peer and mirrored to the rest | peer | keepalive | built |
+| The fear director | the host's tension and its choice of the game's own scares, optionally by an AI agent ([fear-director.md](fear-director.md)) | host | holds until the joiner is ready | built |
 | Roaches | the paged infestation state | host | snapshot | built |
 | Wisp | the killer wisp's hunt, grab, tear | host | none (transient) | works |
 | Pyramid | the walking-pyramid choreography | host | world-actor snapshot and replay | works |
@@ -75,7 +76,7 @@ host validates and commits contested writes), `local` (never shared).
 | Disc slots | the slot a laptop or a signal server holds a disc in, and the disc that comes back out of one | host owns the slot; the peer whose game changed it reports the outcome | every device's slot at the barrier | tested |
 | Shop orders | the client names a row, the host performs and prices it; the delivery queue is the host's, mirrored | arbiter | a reset and every queued order | built |
 | ATV | the driver authors the pose; a non-driving peer runs the rig natively and is corrected; condition (tyres, fuel, health) travels | driver, host for the rest | snapshot | tested; eject and configuration intents not built |
-| Sleep | each peer's rest state and the host's sleeping flag | each peer for its own state; the host relays | the host's flag and every peer not awake | built |
+| Sleep | each peer's rest state and the host's sleeping flag; the night speeds up only when everyone is in bed ([fear-director.md](fear-director.md)) | each peer for its own state; the host relays and owns the shared night | the host's flag and every peer not awake; a joiner ends a shared night | built |
 | Player inventory | per-peer, persisted by the host per player identity; the contents never cross the wire | local; host stores | seeded before the world | tested |
 
 ## Enforced without a packet

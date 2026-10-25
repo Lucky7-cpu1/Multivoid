@@ -169,15 +169,17 @@ Other peers see the death through the ragdoll bit.
 
 ### Sleep
 
-The host sleeps with the game's own sleep: its world runs at the game's speed-up and a client sees the
-clock and the host's actors move faster (`coop/player/sleep_sync`). A client that sleeps keeps its
+The night speeds up only when everyone is in bed: then the host's world runs the game's own speed-up
+and a client sees the clock and the host's actors move faster (`coop/player/sleep_rest`,
+[fear-director.md](fear-director.md)). Until then any player who sleeps, the host included, keeps the
 world at the normal rate: a watch on the game's sleep call takes the world's dilation back to 1 in
 the frame of the call and, while the rest lasts, runs the player's body and the world's effects at
 the game's own factor, with food and coffee settled to the rate they would have had
 (`coop/player/sleep_rest`). What crosses the wire is who rests. Each peer's state (awake, resting
 in a bed or fainted, dreaming in a nightmare) with the bed's class name goes from a client to the
-host, which relays it to every other client; the host's own sleeping flag goes to the clients, which show
-one chat line naming the host when it rises. A joiner is sent the host's flag and every peer's
+host, which relays it to every other client; the host's own sleeping flag goes to the clients. Each peer
+writes its own chat lines from that table: who went to bed and how many are down, everyone asleep,
+someone woke. A joiner is sent the host's flag and every peer's
 state that is not awake, and a leaver is told to every client as awake. A client holds its
 nightmare chance at zero, so a nightmare is a roll of the host's machine alone. `[?]`
 
