@@ -5,6 +5,7 @@
 #include "coop/net/net_clock.h"
 #include "coop/net/session.h"
 #include "coop/player/players_registry.h"
+#include "coop/player/sleep_sync.h"  // EveryoneElseResting: the host's shared-night question
 
 #include "ue_wrap/actors/effects.h"
 #include "ue_wrap/actors/sleep.h"
@@ -61,10 +62,22 @@ bool  g_haveFood = false;
 bool  g_haveCoffee = false;
 float g_foodBase = 0.f;
 float g_coffeeBase = 0.f;
+// The rest in progress is the host's own: a host that loses its last player while resting hands its
+// sleep back to the game's speed-up rather than to factor 1.
+bool  g_restIsHost = false;
+// HOST: the game's own speed-up runs because everyone is in bed: the shared night.
+bool  g_sharedNight = false;
 
-bool ConnectedClient() {
+bool ConnectedPeer() {
     auto* s = g_session.load(std::memory_order_acquire);
-    return s && s->connected() && s->role() == coop::net::Role::Client;
+    return s && s->connected();
+}
+
+bool IsHostSession(const coop::net::Session* s) { return s && s->role() == coop::net::Role::Host; }
+
+bool Sleeping() {
+    float asleep = 0.f;
+    return V::Read(V::Field::Sleeping, &asleep) && asleep != 0.f;
 }
 
 // The local player's body: the registry's (warm while the controller holds the sleeping pawn), else the
@@ -116,6 +129,7 @@ void BeginRest() {
     g_gm.Set(gm);
     g_body.Set(body);
     g_resting = true;
+    g_restIsHost = IsHostSession(g_session.load(std::memory_order_acquire));
     g_haveFood = g_haveCoffee = false;
     UE_LOGI("sleep_rest: rest begun -- the world stays at 1, the body and the world's effects run at %.0f",
             kNativeSleepDilation);
@@ -141,10 +155,15 @@ void EndRest(const char* why) {
 // isSleep guard on `sleep` (mainGamemode.cpp:5495-5583), so a second call while resting sets the world's
 // factor again: it is put back to 1 here as well, and begins no new rest. A second call the game refused
 // leaves the world at the 1 the rest holds, which is legal and returns before the factor check.
+//
+// On the host the same call is the question of the shared night: when every other player already rests in
+// a bed, this sleep is the last one down and the game's own speed-up stays -- the whole session's night
+// runs fast, which every client sees through the host's clock and streams. Otherwise the host rests like
+// a client, at the native factor on its own body, and the night keeps its normal speed for the players
+// still up.
 void OnSleepPost(const sg::Call&) {
-    if (!ConnectedClient()) return;
-    float asleep = 0.f;
-    if (!V::Read(V::Field::Sleeping, &asleep) || asleep == 0.f) return;
+    auto* s = g_session.load(std::memory_order_acquire);
+    if (!s || !s->connected() || !Sleeping()) return;
     if (!SLP::EnsureResolved()) {
         UE_LOGE("sleep_rest: a sleep began and the dilation calls do not resolve -- the world stays at the game's factor");
         return;
@@ -153,6 +172,12 @@ void OnSleepPost(const sg::Call&) {
     // Inside a rest the world already runs at 1: a second call the game refused set nothing, and there is
     // nothing to compare or undo.
     if (g_resting && std::fabs(found - 1.f) <= 0.01f) return;
+    if (IsHostSession(s) && coop::sleep_sync::EveryoneElseResting()) {
+        if (g_resting) EndRest("everyone is asleep");
+        g_sharedNight = true;
+        UE_LOGI("sleep_rest: the host is the last one in bed -- the game's speed-up runs for the whole session");
+        return;
+    }
     if (std::fabs(found - kNativeSleepDilation) > 0.01f && !g_saidFactor) {
         g_saidFactor = true;
         UE_LOGW("sleep_rest: the game's sleep set a world dilation of %.3f, not the pinned %.1f -- a game update "
@@ -184,10 +209,10 @@ void EnsureWatch() {
     sg::ResolvePendingNames();
     if (sg::NameWatchLive(kRowSleep, kTagSleepRest)) {
         g_watchSettled = true;
-        UE_LOGI("sleep_rest: a client's sleep is seen at the call (a script-gate watch on mainGamemode_C::sleep)");
+        UE_LOGI("sleep_rest: this peer's sleep is seen at the call (a script-gate watch on mainGamemode_C::sleep)");
     } else if (sg::NameWatchSettled(kRowSleep, kTagSleepRest)) {
         g_watchSettled = true;
-        UE_LOGE("sleep_rest: the sleep watch is dead -- a client's sleep runs the world at the game's factor");
+        UE_LOGE("sleep_rest: the sleep watch is dead -- this peer's sleep runs the world at the game's factor");
     }
 }
 
@@ -217,12 +242,60 @@ void Install(coop::net::Session* session) {
     g_session.store(session, std::memory_order_release);
 }
 
+// HOST, while it sleeps: move between its own rest and the shared night as the others lie down and get up.
+// True when the caller's rest upkeep below should run this tick.
+bool HostNight(coop::net::Session& s) {
+    if (!g_resting && !g_sharedNight) return false;
+    const bool sleeping = Sleeping();
+    if (!s.connected()) {
+        // The last player left: the host's sleep is the single-player one again, at the game's own speed.
+        if (g_resting) {
+            EndRest("no other player is left");
+            if (sleeping) SLP::SetGlobalTimeDilation(kNativeSleepDilation);
+        }
+        g_sharedNight = false;
+        return false;
+    }
+    if (!sleeping) {
+        if (g_resting) EndRest("the sleeping flag fell");
+        g_sharedNight = false;  // the game's own wake took the world back to 1
+        return false;
+    }
+    const bool all = coop::sleep_sync::EveryoneElseResting();
+    if (g_sharedNight) {
+        if (all) return false;
+        // Someone got up or joined: the night goes back to its normal speed and the host sleeps on at the
+        // native factor on its own body.
+        g_sharedNight = false;
+        if (!SLP::SetGlobalTimeDilation(1.f)) {
+            UE_LOGE("sleep_rest: the shared night could not be slowed back to 1");
+            return false;
+        }
+        UE_LOGI("sleep_rest: a player is up -- the shared night ends, the host rests on its own");
+        BeginRest();
+        return g_resting;
+    }
+    if (all) {
+        EndRest("everyone is asleep");
+        if (SLP::SetGlobalTimeDilation(kNativeSleepDilation)) {
+            g_sharedNight = true;
+            UE_LOGI("sleep_rest: everyone is in bed -- the shared night runs at the game's speed-up");
+        }
+        return false;
+    }
+    return true;
+}
+
 void Tick() {
     auto* s = g_session.load(std::memory_order_acquire);
     if (!s || !s->running()) return;
-    if (s->role() == coop::net::Role::Client) EnsureWatch();
-    if (!g_resting) return;
-    if (!ConnectedClient()) return EndRest("the session left");
+    EnsureWatch();
+    if (IsHostSession(s)) {
+        if (!HostNight(*s)) return;
+    } else {
+        if (!g_resting) return;
+        if (!ConnectedPeer()) return EndRest("the session left");
+    }
     void* const gm = ue_wrap::world_singleton::Gamemode();
     if (!gm || gm != g_gm.Raw() || !g_gm.Alive()) return EndRest("the gamemode changed");
     void* const body = CurrentBody();
@@ -237,7 +310,13 @@ void Tick() {
 }
 
 void OnDisconnect() {
-    if (g_resting) EndRest("the session ended");
+    // A host still asleep keeps its sleep, at the game's own speed again; a client leaves to the menu.
+    if (g_resting) {
+        const bool hostAsleep = g_restIsHost && Sleeping();
+        EndRest("the session ended");
+        if (hostAsleep) SLP::SetGlobalTimeDilation(kNativeSleepDilation);
+    }
+    g_sharedNight = false;
 }
 
 }  // namespace coop::sleep_rest

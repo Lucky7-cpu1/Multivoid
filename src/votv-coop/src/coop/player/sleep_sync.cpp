@@ -7,7 +7,8 @@
 #include "coop/net/net_clock.h"
 #include "coop/net/session.h"
 #include "coop/net/wire_key_util.h"
-#include "coop/player/roster_ledger.h"  // PerSlotState, DisplayName
+#include "coop/player/players_registry.h"  // LocalPeerId: whose line is "you"
+#include "coop/player/roster_ledger.h"  // PerSlotState, DisplayName, Occupied
 #include "coop/text/utf8_codec.h"
 #include "l10n/l10n.h"
 
@@ -102,14 +103,56 @@ void RefuseBed(BedRefusal why, int senderSlot) {
     Refuse("bed", senderSlot);
 }
 
-// The host's name for the chat line; the ledger owns the fallback when the host's row has no nick.
-void PushHostAsleepLine() {
-    const std::string name = coop::text::ToUtf8(coop::roster_ledger::DisplayName(0));
+// ---- the shared night's chat lines ----------------------------------------------------------------
+// Each peer writes its own from the rest table it already holds, so no line crosses the wire: who went
+// to bed and how many are down, and the edge where everyone is (the host's world then runs the game's
+// own speed-up, coop/player/sleep_rest) or where that ends. A status readout of a state that ends:
+// Transient, never history.
+SleepPeerState g_lineSeen[coop::net::kMaxPeers] = {};
+bool g_lineAll = false;
+
+void PushLine(const char* buf) { coop::chat_feed::Push(std::string(buf), coop::chat_feed::Keep::Transient); }
+
+SleepPeerState StateOf(int slot) {
+    return slot == static_cast<int>(coop::players::Registry::Get().LocalPeerId()) ? g_localState : g_state[slot];
+}
+
+void TickLines() {
+    const int self = static_cast<int>(coop::players::Registry::Get().LocalPeerId());
+    int present = 0, resting = 0;
+    for (int slot = 0; slot < static_cast<int>(coop::net::kMaxPeers); ++slot) {
+        if (slot != self && !coop::roster_ledger::Occupied(slot)) { g_lineSeen[slot] = SleepPeerState::Awake; continue; }
+        ++present;
+        if (StateOf(slot) == SleepPeerState::Resting) ++resting;
+    }
+    const bool all = present >= 2 && resting == present;
     char buf[256];
-    if (l10n::Fmt(buf, sizeof(buf), l10n::T("%1$s is asleep -- the world runs faster"), name.c_str()) < 0)
-        return;
-    // A status readout of a state that ends: reading it back hours later would be noise, not history.
-    coop::chat_feed::Push(std::string(buf), coop::chat_feed::Keep::Transient);
+    for (int slot = 0; slot < static_cast<int>(coop::net::kMaxPeers); ++slot) {
+        if (slot != self && !coop::roster_ledger::Occupied(slot)) continue;
+        const SleepPeerState now = StateOf(slot);
+        const SleepPeerState was = g_lineSeen[slot];
+        g_lineSeen[slot] = now;
+        if (now == was || all || present < 2) continue;
+        if (now == SleepPeerState::Resting && was == SleepPeerState::Awake) {
+            if (slot == self) {
+                if (l10n::Fmt(buf, sizeof(buf), l10n::T("You are in bed -- the night speeds up once everyone "
+                                                        "sleeps (%1$d of %2$d asleep)"), resting, present) > 0)
+                    PushLine(buf);
+            } else {
+                const std::string name = coop::text::ToUtf8(coop::roster_ledger::DisplayName(slot));
+                if (l10n::Fmt(buf, sizeof(buf), l10n::T("%1$s went to bed (%2$d of %3$d asleep)"), name.c_str(),
+                              resting, present) > 0)
+                    PushLine(buf);
+            }
+        } else if (now == SleepPeerState::Awake && g_lineAll && slot != self) {
+            const std::string name = coop::text::ToUtf8(coop::roster_ledger::DisplayName(slot));
+            if (l10n::Fmt(buf, sizeof(buf), l10n::T("%1$s woke up -- the night runs at its normal speed"),
+                          name.c_str()) > 0)
+                PushLine(buf);
+        }
+    }
+    if (all && !g_lineAll) PushLine(l10n::T("Everyone is asleep -- the night speeds up"));
+    g_lineAll = all;
 }
 
 // To one slot, or (toSlot < 0) to every client but `exceptSlot` (-1: none).
@@ -246,6 +289,7 @@ void Tick() {
             g_bed[0] = g_localBed;
             if (s->connected()) SendPeerRest(s, -1, 0);
         }
+        if (s->connected()) TickLines();
         return;
     }
 
@@ -255,6 +299,7 @@ void Tick() {
     if (!g_dreamProbSuppressed && SLP::SetDreamProbability(0.f)) g_dreamProbSuppressed = true;
 
     if (g_localState != g_sentState || !SameBed(g_localBed, g_sentBed)) SendClientRest(s);
+    TickLines();
 }
 
 void OnReliable(const uint8_t* payload, size_t len, uint8_t senderSlot) {
@@ -300,7 +345,6 @@ void OnReliable(const uint8_t* payload, size_t len, uint8_t senderSlot) {
     switch (static_cast<SleepOp>(p.op)) {
     case SleepOp::HostAsleep: {
         const bool now = p.state != 0;
-        if (now && !g_hostSleeping) PushHostAsleepLine();
         if (now != g_hostSleeping) UE_LOGI("sleep_sync: the host is %s", now ? "asleep" : "awake");
         g_hostSleeping = now;
         // The host refuses a rest from a slot it does not yet hold world-ready, so a rest sent early is sent
@@ -379,6 +423,19 @@ uint32_t BedRefusalsFrom(int slot, BedRefusal why) {
 
 bool LocalInBed() { return g_localState != SleepPeerState::Awake; }
 
+bool EveryoneElseResting() {
+    auto* s = g_session.load(std::memory_order_acquire);
+    if (!s || !IsHost(s) || !s->connected()) return false;
+    int others = 0;
+    for (int slot = 1; slot < static_cast<int>(coop::net::kMaxPeers); ++slot) {
+        if (!coop::roster_ledger::Occupied(slot)) continue;
+        // A joiner still loading counts as awake: the speed-up must not run under its load.
+        if (!s->IsSlotWorldReady(slot) || g_state[slot] != SleepPeerState::Resting) return false;
+        ++others;
+    }
+    return others > 0;
+}
+
 void OnDisconnect() {
     // Restore the SP nightmare sentinel. A host still asleep keeps sleeping: its timelapse was the game's own
     // all along. A client that loses its session leaves to the menu; its world stays at 1, which is what it ran.
@@ -391,6 +448,8 @@ void OnDisconnect() {
     g_localSleeping = false;
     g_gmInst = nullptr;
     for (auto& st : g_state) st = SleepPeerState::Awake;
+    for (auto& st : g_lineSeen) st = SleepPeerState::Awake;
+    g_lineAll = false;
     std::memset(g_bed, 0, sizeof(g_bed));
     g_hostSleeping = false;
     g_sentState = SleepPeerState::Awake;

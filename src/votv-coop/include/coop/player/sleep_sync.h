@@ -1,14 +1,16 @@
 // coop/player/sleep_sync.h -- who rests: each peer's sleep state, known to the host and to the other clients.
 // Game thread throughout.
 //
-// Every peer sleeps NATIVELY on its own machine: the game's own sleep entry, view, restore and wake
-// (a client's world is held at the normal rate by coop/player/sleep_rest). Nothing here holds a peer's
-// dilation, camera or wake, and nothing waits for anyone. What crosses the wire is the fact of rest:
+// Every peer sleeps NATIVELY on its own machine: the game's own sleep entry, view, restore and wake.
+// The night itself speeds up only when everyone is in bed (coop/player/sleep_rest holds each sleeper's
+// world at the normal rate until then and lets the host's run the game's own speed-up once the last one
+// lies down). Nothing here holds a peer's dilation, camera or wake. What crosses the wire is the fact
+// of rest:
 //   - each peer's state (awake, resting in a bed or fainted, dreaming in a nightmare) with the bed's
 //     class name, sent by a client to the host on a change and relayed by the host to every other client;
-//   - the host's own sleeping flag, which a client shows as one chat line when it rises (the world is
-//     about to run faster: the host's machine runs the game's native speed-up, and a client sees it
-//     through the host's clock and streams).
+//   - the host's own sleeping flag (logged and read by the instruments).
+// Each peer turns the table it holds into its own chat lines: who went to bed and how many are down,
+// and the edge where everyone sleeps and the night speeds up, or someone wakes and it slows again.
 // Late join: a joiner gets the host's flag and every non-awake state; a client repeats a non-awake state on each flag it gets.
 //
 // A client holds dreamProbability at 0 for the session: a nightmare is a roll of the host's machine
@@ -61,6 +63,11 @@ bool HostAsleepNow();
 // client's rest reports the host applied from `slot`; whether this peer's own polled state is not awake.
 uint32_t ReportsApplied(int slot);
 bool LocalInBed();
+
+// HOST, game thread: every other player in the session rests in a bed (dreaming does not count, nor
+// does a joiner whose world is not ready yet), and there is at least one other player. What the host's
+// own sleep asks before it lets the game's speed-up run (coop/player/sleep_rest). False on a client.
+bool EveryoneElseResting();
 
 // Why a bed was refused at the door: a length past the name's room, a character outside an identifier, a nonzero
 // byte past the length, or an Awake report that carries a bed.
