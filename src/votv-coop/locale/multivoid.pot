@@ -154,11 +154,6 @@ msgstr ""
 msgid "%1$s deleted an email: %2$s"
 msgstr ""
 
-#: src/coop/player/sleep_sync.cpp
-#, c-format
-msgid "%1$s is asleep -- the world runs faster"
-msgstr ""
-
 #: src/coop/session/player_handshake.cpp
 #, c-format
 msgid "%1$s is connecting to the game..."
@@ -204,6 +199,16 @@ msgstr ""
 #: src/coop/session/player_handshake_version.cpp
 #, c-format
 msgid "%1$s was turned away: unofficial build %2$s [%3$s]"
+msgstr ""
+
+#: src/coop/player/sleep_sync.cpp
+#, c-format
+msgid "%1$s went to bed (%2$d of %3$d asleep)"
+msgstr ""
+
+#: src/coop/player/sleep_sync.cpp
+#, c-format
+msgid "%1$s woke up -- the night runs at its normal speed"
 msgstr ""
 
 #: src/ui/loading_screen.cpp
@@ -327,6 +332,27 @@ msgstr ""
 msgid "A second hello arrived on one connection."
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "AI agent"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "AI agent chooses the scares"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+#, c-format
+msgid "AI agent: %s"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "API key: not set -- get one at console.anthropic.com"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "API key: set (kept on this computer only)"
+msgstr ""
+
 #: src/ui/admin_panel.cpp
 msgid "Actions"
 msgstr ""
@@ -341,6 +367,10 @@ msgstr ""
 
 #: include/coop/config/config_registry_rows.inc
 msgid "Allow other builds"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Allow the deadly invasions"
 msgstr ""
 
 #: src/ui/admin_panel.cpp src/ui/scoreboard.cpp
@@ -377,6 +407,10 @@ msgstr ""
 
 #: src/ui/end_reason_dialog.cpp
 msgid "COULD NOT CONNECT"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Calm down"
 msgstr ""
 
 #: src/ui/server_browser_panels.cpp
@@ -549,6 +583,14 @@ msgstr ""
 msgid "Direct connect"
 msgstr ""
 
+#: src/ui/dev_menu.cpp
+msgid "Director"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Director on"
+msgstr ""
+
 #: src/ui/admin_panel.cpp src/ui/scoreboard.cpp
 msgid "Disconnected now and refused whenever they rejoin."
 msgstr ""
@@ -578,12 +620,20 @@ msgstr ""
 msgid "Each surface picks its own family; applies on the next frame."
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "Email language"
+msgstr ""
+
 #: src/ui/chat_input.cpp
 msgid "Enter = send, Esc = close, Up/Down = history"
 msgstr ""
 
 #: src/ui/admin_panel.cpp
 msgid "Everyone in the registry is online."
+msgstr ""
+
+#: src/coop/player/sleep_sync.cpp
+msgid "Everyone is asleep -- the night speeds up"
 msgstr ""
 
 #: src/ui/dev_menu.cpp
@@ -594,6 +644,10 @@ msgstr ""
 msgid "Exchanging identities with the host"
 msgstr ""
 
+#: src/ui/dev_menu.cpp
+msgid "Fear director"
+msgstr ""
+
 #: src/ui/bug_report_pane.cpp
 msgid "Files that will be included"
 msgstr ""
@@ -601,6 +655,10 @@ msgstr ""
 #: src/ui/loading_screen.cpp
 #, c-format
 msgid "Finding a route to %s"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Forget key"
 msgstr ""
 
 #: src/ui/world_rules_panel.cpp
@@ -616,11 +674,20 @@ msgstr ""
 msgid "HOST"
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "Hold scares while anyone sleeps"
+msgstr ""
+
 #: src/ui/voice_panel.cpp
 #, c-format
 msgid ""
 "Hold the key to talk. Change the key via %s\n"
 "in multivoid.ini (single letter or a virtual-key number)."
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+#, c-format
+msgid "Holding: %s"
 msgstr ""
 
 #: src/ui/admin_panel.cpp
@@ -635,6 +702,10 @@ msgstr ""
 
 #: src/ui/admin_panel.cpp src/ui/scoreboard.cpp
 msgid "ID"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Intensity"
 msgstr ""
 
 #: src/ui/dev_menu.cpp
@@ -675,6 +746,11 @@ msgstr ""
 
 #: include/coop/config/config_registry_rows.inc
 msgid "Let players whose Multivoid build differs from this server's join -- an unofficial build when this server runs the official one, the official build when this server runs a modified one. Applies to the next joins; players already in stay."
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+#, c-format
+msgid "Letting the players breathe: %d s"
 msgstr ""
 
 #: src/ui/voice_panel.cpp
@@ -724,6 +800,10 @@ msgstr ""
 
 #: src/ui/voice_panel.cpp
 msgid "Microphone"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Model"
 msgstr ""
 
 #: src/ui/game_build_dialog.cpp
@@ -996,6 +1076,10 @@ msgstr ""
 msgid "Receiving world from the host"
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "Recent scares"
+msgstr ""
+
 #: src/ui/skins_panel.cpp
 msgid "Refresh list"
 msgstr ""
@@ -1053,6 +1137,10 @@ msgstr ""
 msgid "Rules"
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "Save key"
+msgstr ""
+
 #: src/ui/bug_report_pane.cpp
 msgid "Save report"
 msgstr ""
@@ -1082,6 +1170,14 @@ msgid ""
 "Scales the WHOLE overlay (menus, chat, nameplates) on top of the\n"
 "automatic resolution scale. Applies when you release the slider\n"
 "(the fonts re-bake). Saved to multivoid.ini (ui.scale)."
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Scare now (the director picks)"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Seconds between looks"
 msgstr ""
 
 #: src/ui/dev_menu.cpp
@@ -1202,6 +1298,14 @@ msgstr ""
 msgid "Teleport to me"
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "Tension"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "Test one scare (both players should see it)"
+msgstr ""
+
 #: src/coop/props/prop_act_request.cpp
 msgid "That can't be done right now."
 msgstr ""
@@ -1230,6 +1334,10 @@ msgstr ""
 msgid "That's your own server -- you're already hosting it."
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "The agent may send emails to the base"
+msgstr ""
+
 #: src/ui/admin_panel.cpp
 msgid "The ban file has entries this version cannot read, so bans made now last until the server stops. See the log."
 msgstr ""
@@ -1244,6 +1352,10 @@ msgstr ""
 
 #: src/coop/net/end_reason.cpp
 msgid "The download of the host's world stopped part way through."
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "The fear director runs on the host of a multiplayer session. Host one to use it; as a client you just get scared."
 msgstr ""
 
 #: src/coop/bug_report/report_bundle.cpp
@@ -1647,6 +1759,10 @@ msgstr ""
 msgid "Waiting for the host's world"
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "Watching the players."
+msgstr ""
+
 #: src/ui/bug_report_pane.cpp
 msgid "What happened"
 msgstr ""
@@ -1682,6 +1798,11 @@ msgstr ""
 
 #: src/coop/net/end_reason.cpp
 msgid "You are banned from this server."
+msgstr ""
+
+#: src/coop/player/sleep_sync.cpp
+#, c-format
+msgid "You are in bed -- the night speeds up once everyone sleeps (%1$d of %2$d asleep)"
 msgstr ""
 
 #: src/ui/game_build_dialog.cpp
@@ -1814,6 +1935,10 @@ msgstr ""
 msgid "n/a"
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "normal"
+msgstr ""
+
 #: src/ui/admin_panel.cpp
 msgid "not blocked"
 msgstr ""
@@ -1852,8 +1977,16 @@ msgstr ""
 msgid "reason (shown in the Banned list)"
 msgstr ""
 
+#: src/ui/fear_pane.cpp
+msgid "relentless"
+msgstr ""
+
 #: src/ui/chat_input.cpp
 msgid "say:"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "slow burn"
 msgstr ""
 
 #: src/ui/dev_menu.cpp
@@ -1892,6 +2025,10 @@ msgstr ""
 #: src/ui/scoreboard.cpp
 #, c-format
 msgid "volume %.2fx"
+msgstr ""
+
+#: src/ui/fear_pane.cpp
+msgid "waiting for its first look"
 msgstr ""
 
 #: src/coop/bug_report/report_files.cpp

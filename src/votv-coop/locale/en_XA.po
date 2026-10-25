@@ -127,10 +127,6 @@ msgid "%1$s deleted an email: %2$s"
 msgstr "[[%1$s deleted an email: %2$s]]"
 
 #, c-format
-msgid "%1$s is asleep -- the world runs faster"
-msgstr "[[%1$s is asleep -- the world runs faster]]"
-
-#, c-format
 msgid "%1$s is connecting to the game..."
 msgstr "[[%1$s is connecting to the game...]]"
 
@@ -167,6 +163,14 @@ msgstr "[[%1$s was turned away: official build %2$s [%3$s]]]"
 #, c-format
 msgid "%1$s was turned away: unofficial build %2$s [%3$s]"
 msgstr "[[%1$s was turned away: unofficial build %2$s [%3$s]]]"
+
+#, c-format
+msgid "%1$s went to bed (%2$d of %3$d asleep)"
+msgstr "[[%1$s went to bed (%2$d of %3$d asleep)]]"
+
+#, c-format
+msgid "%1$s woke up -- the night runs at its normal speed"
+msgstr "[[%1$s woke up -- the night runs at its normal speed]]"
 
 #, c-format
 msgid "%1$u / %2$u objects"
@@ -267,6 +271,22 @@ msgstr "[[A proof arrived before a hello.]]"
 msgid "A second hello arrived on one connection."
 msgstr "[[A second hello arrived on one connection.]]"
 
+msgid "AI agent"
+msgstr "[[AI agent]]"
+
+msgid "AI agent chooses the scares"
+msgstr "[[AI agent chooses the scares]]"
+
+#, c-format
+msgid "AI agent: %s"
+msgstr "[[AI agent: %s]]"
+
+msgid "API key: not set -- get one at console.anthropic.com"
+msgstr "[[API key: not set -- get one at console.anthropic.com]]"
+
+msgid "API key: set (kept on this computer only)"
+msgstr "[[API key: set (kept on this computer only)]]"
+
 msgid "Actions"
 msgstr "[[Actions]]"
 
@@ -278,6 +298,9 @@ msgstr "[[Administration]]"
 
 msgid "Allow other builds"
 msgstr "[[Allow other builds]]"
+
+msgid "Allow the deadly invasions"
+msgstr "[[Allow the deadly invasions]]"
 
 msgid "Also refuse their address"
 msgstr "[[Also refuse their address]]"
@@ -305,6 +328,9 @@ msgstr "[[Body skin not saved]]"
 
 msgid "COULD NOT CONNECT"
 msgstr "[[COULD NOT CONNECT]]"
+
+msgid "Calm down"
+msgstr "[[Calm down]]"
 
 #, c-format
 msgid "Cannot reach the %s server list. Check your connection."
@@ -440,6 +466,12 @@ msgstr "[[Direct]]"
 msgid "Direct connect"
 msgstr "[[Direct connect]]"
 
+msgid "Director"
+msgstr "[[Director]]"
+
+msgid "Director on"
+msgstr "[[Director on]]"
+
 msgid "Disconnected now and refused whenever they rejoin."
 msgstr "[[Disconnected now and refused whenever they rejoin.]]"
 
@@ -465,11 +497,17 @@ msgstr "[[Duplicate settings with different values]]"
 msgid "Each surface picks its own family; applies on the next frame."
 msgstr "[[Each surface picks its own family; applies on the next frame.]]"
 
+msgid "Email language"
+msgstr "[[Email language]]"
+
 msgid "Enter = send, Esc = close, Up/Down = history"
 msgstr "[[Enter = send, Esc = close, Up/Down = history]]"
 
 msgid "Everyone in the registry is online."
 msgstr "[[Everyone in the registry is online.]]"
+
+msgid "Everyone is asleep -- the night speeds up"
+msgstr "[[Everyone is asleep -- the night speeds up]]"
 
 msgid "Everything scales with the screen automatically; this is your extra zoom."
 msgstr "[[Everything scales with the screen automatically; this is your extra zoom.]]"
@@ -477,12 +515,18 @@ msgstr "[[Everything scales with the screen automatically; this is your extra zo
 msgid "Exchanging identities with the host"
 msgstr "[[Exchanging identities with the host]]"
 
+msgid "Fear director"
+msgstr "[[Fear director]]"
+
 msgid "Files that will be included"
 msgstr "[[Files that will be included]]"
 
 #, c-format
 msgid "Finding a route to %s"
 msgstr "[[Finding a route to %s]]"
+
+msgid "Forget key"
+msgstr "[[Forget key]]"
 
 msgid "Gamemode:"
 msgstr "[[Gamemode:]]"
@@ -494,6 +538,9 @@ msgstr "[[Graphics API: %s]]"
 msgid "HOST"
 msgstr "[[HOST]]"
 
+msgid "Hold scares while anyone sleeps"
+msgstr "[[Hold scares while anyone sleeps]]"
+
 #, c-format
 msgid ""
 "Hold the key to talk. Change the key via %s\n"
@@ -501,6 +548,10 @@ msgid ""
 msgstr ""
 "[[Hold the key to talk. Change the key via %s\n"
 "in multivoid.ini (single letter or a virtual-key number).]]"
+
+#, c-format
+msgid "Holding: %s"
+msgstr "[[Holding: %s]]"
 
 msgid ""
 "Host administration. Bans follow the player and survive restarts;\n"
@@ -514,6 +565,9 @@ msgstr "[[Host game]]"
 
 msgid "ID"
 msgstr "[[ID]]"
+
+msgid "Intensity"
+msgstr "[[Intensity]]"
 
 msgid "Interface"
 msgstr "[[Interface]]"
@@ -545,6 +599,10 @@ msgstr "[[Left the session.]]"
 
 msgid "Let players whose Multivoid build differs from this server's join -- an unofficial build when this server runs the official one, the official build when this server runs a modified one. Applies to the next joins; players already in stay."
 msgstr "[[Let players whose Multivoid build differs from this server's join -- an unofficial build when this server runs the official one, the official build when this server runs a modified one. Applies to the next joins; players already in stay.]]"
+
+#, c-format
+msgid "Letting the players breathe: %d s"
+msgstr "[[Letting the players breathe: %d s]]"
 
 msgid "Levels"
 msgstr "[[Levels]]"
@@ -582,6 +640,9 @@ msgstr "[[Mic muted]]"
 
 msgid "Microphone"
 msgstr "[[Microphone]]"
+
+msgid "Model"
+msgstr "[[Model]]"
 
 msgid "Multiplayer may not work: you may not see other players, and some features may be off. Check for a Multivoid update made for your game version."
 msgstr "[[Multiplayer may not work: you may not see other players, and some features may be off. Check for a Multivoid update made for your game version.]]"
@@ -794,6 +855,9 @@ msgstr "[[Reason]]"
 msgid "Receiving world from the host"
 msgstr "[[Receiving world from the host]]"
 
+msgid "Recent scares"
+msgstr "[[Recent scares]]"
+
 msgid "Refresh list"
 msgstr "[[Refresh list]]"
 
@@ -847,6 +911,9 @@ msgstr "[[Rule]]"
 msgid "Rules"
 msgstr "[[Rules]]"
 
+msgid "Save key"
+msgstr "[[Save key]]"
+
 msgid "Save report"
 msgstr "[[Save report]]"
 
@@ -877,6 +944,12 @@ msgstr ""
 "[[Scales the WHOLE overlay (menus, chat, nameplates) on top of the\n"
 "automatic resolution scale. Applies when you release the slider\n"
 "(the fonts re-bake). Saved to multivoid.ini (ui.scale).]]"
+
+msgid "Scare now (the director picks)"
+msgstr "[[Scare now (the director picks)]]"
+
+msgid "Seconds between looks"
+msgstr "[[Seconds between looks]]"
 
 msgid "Select a category on the left."
 msgstr "[[Select a category on the left.]]"
@@ -974,6 +1047,12 @@ msgstr "[[Talking]]"
 msgid "Teleport to me"
 msgstr "[[Teleport to me]]"
 
+msgid "Tension"
+msgstr "[[Tension]]"
+
+msgid "Test one scare (both players should see it)"
+msgstr "[[Test one scare (both players should see it)]]"
+
 msgid "That can't be done right now."
 msgstr "[[That can't be done right now.]]"
 
@@ -995,6 +1074,9 @@ msgstr "[[That text is too long.]]"
 msgid "That's your own server -- you're already hosting it."
 msgstr "[[That's your own server -- you're already hosting it.]]"
 
+msgid "The agent may send emails to the base"
+msgstr "[[The agent may send emails to the base]]"
+
 msgid "The ban file has entries this version cannot read, so bans made now last until the server stops. See the log."
 msgstr "[[The ban file has entries this version cannot read, so bans made now last until the server stops. See the log.]]"
 
@@ -1006,6 +1088,9 @@ msgstr "[[The connection was lost.]]"
 
 msgid "The download of the host's world stopped part way through."
 msgstr "[[The download of the host's world stopped part way through.]]"
+
+msgid "The fear director runs on the host of a multiplayer session. Host one to use it; as a client you just get scared."
+msgstr "[[The fear director runs on the host of a multiplayer session. Host one to use it; as a client you just get scared.]]"
 
 msgid "The game is closing."
 msgstr "[[The game is closing.]]"
@@ -1318,6 +1403,9 @@ msgstr "[[Waiting for the host to capture its world]]"
 msgid "Waiting for the host's world"
 msgstr "[[Waiting for the host's world]]"
 
+msgid "Watching the players."
+msgstr "[[Watching the players.]]"
+
 msgid "What happened"
 msgstr "[[What happened]]"
 
@@ -1345,6 +1433,10 @@ msgstr "[[Wrong password.]]"
 
 msgid "You are banned from this server."
 msgstr "[[You are banned from this server.]]"
+
+#, c-format
+msgid "You are in bed -- the night speeds up once everyone sleeps (%1$d of %2$d asleep)"
+msgstr "[[You are in bed -- the night speeds up once everyone sleeps (%1$d of %2$d asleep)]]"
 
 msgid "You can play anyway. This message will not show again for this game version."
 msgstr "[[You can play anyway. This message will not show again for this game version.]]"
@@ -1451,6 +1543,9 @@ msgstr ""
 msgid "n/a"
 msgstr "[[n/a]]"
 
+msgid "normal"
+msgstr "[[normal]]"
+
 msgid "not blocked"
 msgstr "[[not blocked]]"
 
@@ -1480,8 +1575,14 @@ msgstr "[[pkt/s  %1$.0f in   %2$.0f out]]"
 msgid "reason (shown in the Banned list)"
 msgstr "[[reason (shown in the Banned list)]]"
 
+msgid "relentless"
+msgstr "[[relentless]]"
+
 msgid "say:"
 msgstr "[[say:]]"
+
+msgid "slow burn"
+msgstr "[[slow burn]]"
 
 msgid "starting up"
 msgstr "[[starting up]]"
@@ -1511,6 +1612,9 @@ msgstr "[[updated just now]]"
 #, c-format
 msgid "volume %.2fx"
 msgstr "[[volume %.2fx]]"
+
+msgid "waiting for its first look"
+msgstr "[[waiting for its first look]]"
 
 msgid "written by a build with another log format"
 msgstr "[[written by a build with another log format]]"

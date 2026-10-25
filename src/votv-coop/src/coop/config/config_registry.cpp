@@ -414,6 +414,7 @@ constexpr const char* const kCredentials[] = {
     "net.signaling_token",   // the relay's bearer
     "net.turn_pass",         // the TURN credential
     "net.turn_user",         // the TURN account name: a credential of the pair, so not quoted
+    "director.ai_key",       // the host's Claude API key, which the AI director's requests carry
 };
 
 // The scope marks, checked by the compiler (Source declares FCVAR_REPLICATED and FCVAR_PROTECTED

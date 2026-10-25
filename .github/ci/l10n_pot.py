@@ -84,6 +84,7 @@ ALLOWLIST = [
     "src/ui/server_browser_panels.cpp",
     "src/ui/server_browser_rows.cpp",
     "src/ui/server_settings_pane.cpp",
+    "src/ui/fear_pane.cpp",
     "src/ui/skins_panel.cpp",
     "src/ui/voice_icons.cpp",
     "src/ui/voice_panel.cpp",

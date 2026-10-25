@@ -20,6 +20,7 @@
 #include "ui/net_stats_panel.h"
 #include "ui/scale.h"
 #include "ui/bug_report_pane.h"
+#include "ui/fear_pane.h"  // F1 > Fear director (the host's controls; a client gets one line)
 #include "ui/server_settings_pane.h"
 #include "ui/skins_panel.h"
 
@@ -224,6 +225,11 @@ const std::vector<Cat>& Tree() {
             { "Weather",  { { &ui::dev_panes::RenderSnow, true } }, true },
             { "Clock",    { { &ui::dev_panes::RenderSetClock, true } }, true },
             { "Economy",  { { &ui::dev_panes::RenderGivePoints, true } }, true },
+        }, false },
+        // The fear director: the host's pacing of the night (coop/fear). Not host-gated, so a client
+        // reads the one line that says who runs it.
+        { L10N_MARK("Fear director"), {
+            { L10N_MARK("Director"), { { &ui::fear_pane::Render, false } }, false },
         }, false },
         { "Content", {
             // The game's spawnable/triggerable content. Entities = creature/entity

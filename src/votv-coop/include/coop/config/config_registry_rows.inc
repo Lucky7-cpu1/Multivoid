@@ -282,5 +282,31 @@ CFG_FLAG(voice_test_tone, "voice.test_tone", "voice", false, "VOTVCOOP_VOICE_TES
 CFG_FLAG(voice_loopback, "voice.loopback", "voice", false, "VOTVCOOP_VOICE_LOOPBACK",
     "Dev: play your own transmitted voice back locally.")
 
+// The [director] section: the host's fear director (coop/fear). Every row is read on the host
+// alone; a client's values are never consulted. Local rows: the F1 > Fear director pane edits them.
+CFG_FLAG(director_enabled, "director.enabled", "director", true, "VOTVCOOP_DIRECTOR_ENABLED",
+    "The fear director: on the host it watches the players and fires the game's own scares when the "
+    "tension is right. It only picks scares that every player sees.")
+CFG_INT(director_intensity, "director.intensity", "director", 2, 1, 3, "VOTVCOOP_DIRECTOR_INTENSITY",
+    "How fast the tension builds: 1 = slow burn, 2 = normal, 3 = relentless.")
+CFG_FLAG(director_respect_sleep, "director.respect_sleep", "director", true, nullptr,
+    "Hold the director's scares while anyone is in bed (an event wakes a sleeper).")
+CFG_FLAG(director_allow_dangerous, "director.allow_dangerous", "director", false, nullptr,
+    "Let the director start the invasions that can kill players or wreck the base.")
+CFG_FLAG(director_ai, "director.ai", "director", false, "VOTVCOOP_DIRECTOR_AI",
+    "Let an AI model (the Claude API) choose the director's scares and write messages to the base's "
+    "email. Needs director.ai_key. The host pays for the requests with that key.")
+CFG_STRING(director_ai_key, "director.ai_key", "director", "", "VOTVCOOP_DIRECTOR_AI_KEY", false,
+    "The Claude API key the AI director uses (from console.anthropic.com). Kept on this machine only; "
+    "never sent to the other players. Empty also tries the ANTHROPIC_API_KEY environment variable.")
+CFG_STRING(director_ai_model, "director.ai_model", "director", "claude-haiku-5-5", nullptr, false,
+    "The Claude model the AI director asks.")
+CFG_INT(director_ai_period_s, "director.ai_period_s", "director", 60, 20, 600, nullptr,
+    "Seconds between the AI director's looks at the situation.")
+CFG_FLAG(director_ai_emails, "director.ai_emails", "director", true, nullptr,
+    "Let the AI director send short unsettling emails to the base computer.")
+CFG_STRING(director_ai_language, "director.ai_language", "director", "English", nullptr, false,
+    "The language the AI director writes its emails in, as a word: English, Russian...")
+
 // The [dev] section, its own file: it grows with every drill, and the rows above are the product's.
 #include "coop/config/config_registry_rows_dev.inc"

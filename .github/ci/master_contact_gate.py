@@ -74,6 +74,15 @@ PLAYER_TRIGGERED = {
 ALLOWED_RAW_CONNECT = {"coop/net/signaling_client.cpp"}
 ALLOWED_ICE_CONFIG = {"coop/net/ice_config.cpp"}
 
+# --- class 5: WinHTTP clients ------------------------------------------------
+# An HTTP request that does not go through http::Post/Get reaches the network through its own
+# WinHttpConnect, which none of the patterns above read. Two files may open one: the master's
+# client, and the fear director's AI agent, which talks to api.anthropic.com -- and only when the
+# HOST turned director.ai on and gave it their own API key (coop/fear/fear_http.h says
+# what the request carries). Any other WinHTTP client is a new outside contact and fails here.
+ALLOWED_WINHTTP = {"coop/net/http_client.cpp", "coop/fear/fear_http.cpp"}
+WINHTTP_CONNECT = re.compile(r"\bWinHttpConnect\s*\(")
+
 # Two forms, and the second one is why this gate nearly shipped with the same blind
 # spot the first census had. `lobby_client.cpp:46` calls `http::Get(masterUrl, path, ...)`
 # where `path` is a VARIABLE, so a literal-only pattern silently counted six endpoints
@@ -139,6 +148,9 @@ def main() -> int:
             fails.append(f"{rel}: opens a raw socket connection. Only "
                          f"{sorted(ALLOWED_RAW_CONNECT)} may -- a new one is a new class "
                          f"of contact that no http:: census would see.")
+        if WINHTTP_CONNECT.search(code) and rel not in ALLOWED_WINHTTP:
+            fails.append(f"{rel}: opens its own WinHTTP connection. Only {sorted(ALLOWED_WINHTTP)} "
+                         f"may -- a new HTTP client is a new outside contact; declare it here.")
         if ICE_WRITE.search(code) and rel not in ALLOWED_ICE_CONFIG:
             fails.append(f"{rel}: writes STUN/TURN config. Only {sorted(ALLOWED_ICE_CONFIG)} "
                          f"may -- these hand a third party (and our relay) the player's address.")

@@ -85,6 +85,7 @@ set(VOTVCOOP_SOURCES
     src/ue_wrap/devices/grime.cpp
     src/ue_wrap/world/daynightcycle.cpp
     src/ue_wrap/world/active_events.cpp
+    src/ue_wrap/world/ambient_verbs.cpp
     src/ue_wrap/world/jellyfish_path.cpp
     src/ue_wrap/world/bad_sun.cpp
     src/ue_wrap/world/red_sky.cpp
@@ -536,6 +537,10 @@ set(VOTVCOOP_SOURCES
     src/coop/interactables/floppybox_sync.cpp
     src/coop/interactables/signal_catch_sync.cpp
     src/coop/player/sleep_rest.cpp
+    src/coop/fear/fear_catalog.cpp
+    src/coop/fear/fear_director.cpp
+    src/coop/fear/fear_ai.cpp
+    src/coop/fear/fear_http.cpp
     src/coop/player/sleep_sync.cpp
     src/coop/creatures/wisp_attack_sync.cpp
     src/coop/creatures/wisp_grab_hold.cpp
@@ -595,6 +600,7 @@ set(VOTVCOOP_SOURCES
     src/ui/admin_panel.cpp
     src/ui/bug_report_pane.cpp
     src/ui/server_settings_pane.cpp
+    src/ui/fear_pane.cpp
     src/ui/world_rules_panel.cpp
     src/ui/scoreboard.cpp
     src/ui/link_format.cpp
