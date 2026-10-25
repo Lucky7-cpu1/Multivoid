@@ -30,7 +30,10 @@ inline constexpr uint32_t kMagic = 0x564D5450u;
 // This file is past the 1500-line hard cap and stays there: it is the single-feature exception the
 // rule names. One wire format, whose enum, payload structs and static_asserts are read together;
 // splitting it would put a kind's number in one file and its bytes in another.
-inline constexpr uint16_t kProtocolVersion = 249;
+// The fear-director fork numbers its builds 9000 + the upstream build it is based on (b249), so its
+// lobbies never pair with an official cohort: a client replays the director's re-armed scares and a
+// host's night speeds up only when everyone sleeps, which an official peer does not do.
+inline constexpr uint16_t kProtocolVersion = 9249;
 
 // Default LAN port (overridable via multivoid.ini "net.port=").
 inline constexpr uint16_t kDefaultPort = 47621;
