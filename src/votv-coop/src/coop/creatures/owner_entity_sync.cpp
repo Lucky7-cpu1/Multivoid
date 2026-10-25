@@ -46,7 +46,12 @@ std::atomic<coop::net::Session*> g_session{nullptr};
 // ---- the member-class table (classId = index). Extend here for the next
 // stalker-entity member; every row is per-peer-owned + cross-peer mirrored.
 constexpr const wchar_t* kOwnerEntityClasses[] = {
-    L"eyer_C",   // classId 0: the night "Eyes" stalker (ticker_eyers)
+    L"eyer_C",       // classId 0: the night "Eyes" stalker (ticker_eyers)
+    // The two scare characters a trigger spawns for the player who walked into it (the game's scares
+    // are per viewer). Mirrored, the friend standing beside that player sees the thing too. [?] that a
+    // trigger spawns them through BeginDeferred: a level-placed copy is never caught, and costs nothing.
+    L"mann_C",       // classId 1: the mannequin scare (objects/mann, a Character)
+    L"humpscare_C",  // classId 2: the jump scare that senses a pawn (objects/humpscare, a Character)
 };
 constexpr size_t kOwnerEntityClassCount =
     sizeof(kOwnerEntityClasses) / sizeof(kOwnerEntityClasses[0]);
@@ -227,7 +232,7 @@ void Install(coop::net::Session* session) {
         return;
     }
     g_observerArmed = true;
-    UE_LOGI("owner_entity: armed (%zu member class(es); eyer_C classId=0) -- per-peer owned, "
+    UE_LOGI("owner_entity: armed (%zu member class(es): eyer_C, mann_C, humpscare_C) -- per-peer owned, "
             "cross-peer mirrored", kOwnerEntityClassCount);
 }
 

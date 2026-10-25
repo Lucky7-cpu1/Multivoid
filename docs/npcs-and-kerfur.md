@@ -42,7 +42,8 @@ behaviour loop reads the local player. Suppressing them on clients would delete 
 and rolling them on the host would anchor them to the wrong player. So each peer keeps its native
 roll, owns the entity it rolled, and broadcasts it so every other peer renders a display mirror
 (`coop/creatures/owner_entity_sync`). The first member is the night stalker, the eyes that watch
-from the dark.
+from the dark; the mannequin scare and the jump scare a trigger spawns for one player are the next two,
+so the friend beside them sees the thing as well.
 
 ### Which spawners a client refuses
 
@@ -164,7 +165,7 @@ wisp in flight is transient and owes nothing.
 |---|---|
 | The Omega's take-object, pat, equipment, kill and sit-on-the-ATV verbs are not synced | `[V]` `coop/creatures/kerfur_command`, the verb table |
 | The Omega's floppy state is not synced, so a relayed get-reports diverges on its result; its accessories and carried object likewise | `[V]` no lane under `coop/creatures` carries them |
-| Only one stalker class is owned per peer so far | `[V]` `coop/creatures/owner_entity_sync`, the member table |
+| Three classes are owned per peer so far (the eyer, the mannequin and the jump scare); whether a trigger spawns the latter two through the seam the lane watches is still to be measured | `[V]` `coop/creatures/owner_entity_sync`, the member table; `[?]` the spawn route |
 | The conversion is detected by a poll, five times a second, not at the verb | `[V]` `coop/creatures/kerfur_convert`; the lane reads the result rather than the call, because a peer's own conversion has already happened by the time any watch of ours runs |
 | Nine ambient spawner families are neither mirrored nor refused, so each peer grows its own deer, hexahives, walking trees and the rest | `[V]` they appear in no lane under `coop/creatures` and in no row of `coop/world/spawn_authority` |
 
