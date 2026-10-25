@@ -385,8 +385,9 @@ ReplayStep TryReplay(const PendingFire& pf) {
         return ReplayStep::NotReady;
     if (g_boundGen == 0) g_boundGen = ue_wrap::world_identity::Generation();
     // Dedupe applies to one-shot scheduled rows only (the game's own passEvents semantics);
-    // specials (graffiti, pranks the menu re-fires) are repeatable by design.
-    if (pf.kind == FireKind::RunEvent) {
+    // specials (graffiti, pranks the menu re-fires) are repeatable by design, and so are the scare
+    // arms the host may re-arm (Rearmable): each fire of one arms the trap again.
+    if (pf.kind == FireKind::RunEvent && !Rearmable(pf.name)) {
         if (g_replayed.count(pf.name)) {
             UE_LOGI("event_fire: '%s' already replayed this session -- skipping", pf.name.c_str());
             return ReplayStep::Done;
@@ -410,7 +411,7 @@ ReplayStep TryReplay(const PendingFire& pf) {
     // dispatch (a frame or call failure is loud and must not eat the row).
     if (NativeFire(pf.kind, w, L"None")) {
         g_replays.fetch_add(1, std::memory_order_relaxed);
-        if (pf.kind == FireKind::RunEvent) g_replayed.insert(pf.name);
+        if (pf.kind == FireKind::RunEvent && !Rearmable(pf.name)) g_replayed.insert(pf.name);
     }
     return ReplayStep::Done;
 }
@@ -645,7 +646,7 @@ void OnReliable(const coop::net::EventFirePayload& payload) {
     // One-shot rows dedupe at queue time too (a scheduler re-fire of a dev-fired row during the
     // same load window would otherwise queue twice; the replay would catch it later, but a
     // duplicate-free queue keeps the cap honest).
-    if (kind == FireKind::RunEvent) {
+    if (kind == FireKind::RunEvent && !Rearmable(name)) {
         for (const auto& q : g_pending)
             if (q.kind == kind && q.name == name) return;
     }

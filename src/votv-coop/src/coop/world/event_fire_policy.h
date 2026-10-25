@@ -10,4 +10,10 @@ namespace coop::event_fire_sync {
 // unknown -- the default is no replay.
 int ReplayVerdict(const std::string& name, const char** laneOut);
 
+// The replayed rows a host may fire again in one session: the trigger-box scare arms. Re-arming one is the
+// whole effect, so a client replays every fire of it rather than the first alone, and its own history of
+// the row (the passEvents a joiner's save carried) does not stop the re-arm. The fear director re-arms
+// these (coop/fear).
+bool Rearmable(const std::string& name);
+
 }  // namespace coop::event_fire_sync

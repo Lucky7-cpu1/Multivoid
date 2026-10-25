@@ -103,6 +103,11 @@ const NoReplayRow kNoReplayRows[] = {
     { "alienSounds", "sound gap (future WorldSoundCue)" },
 };
 
+// The scare arms: the trigger-box rows above whose replay arms the client's own copy, and nothing else.
+const char* const kRearmableRows[] = {
+    "toeStab", "falseEnter", "mann", "vent", "fakeGrays",
+};
+
 // The interaction rows: the row's entire effect is the prank special, host-local RNG.
 static bool IsPrankRow(const std::string& n) {
     return n.rfind("arirInteraction_", 0) == 0;
@@ -115,6 +120,12 @@ int ReplayVerdict(const std::string& name, const char** laneOut) {
         if (name == nr.name) { *laneOut = nr.lane; return 0; }
     if (IsPrankRow(name)) { *laneOut = "prank special (host-local RNG)"; return 0; }
     return -1;
+}
+
+bool Rearmable(const std::string& name) {
+    for (const char* r : kRearmableRows)
+        if (name == r) return true;
+    return false;
 }
 
 }  // namespace coop::event_fire_sync
