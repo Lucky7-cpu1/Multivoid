@@ -73,6 +73,10 @@ constexpr uint64_t kEmailGapMs = 10ull * 60 * 1000;
 // The email sender the agent writes as: enum_emailChars' third entry, the base's automatic system.
 constexpr uint8_t kEmailSender = 2;
 constexpr size_t kMaxRows = 32;
+// A rise in the game's own event count holds the director this long, and no longer: some event actors
+// keep their registration for the whole session (a creature roaming the map, an event that never ends),
+// and a count that never falls must not silence the night. A new rise holds again.
+constexpr uint64_t kEventHoldMs = 3ull * 60 * 1000;
 constexpr size_t kFiredKept = View::kLines;
 
 struct Fired {
@@ -100,6 +104,10 @@ struct State {
     std::string aiState;
     std::string aiNote;
     std::string hold;
+    int eventsLast = 0;            // the game's event count at the last look
+    uint64_t eventHoldUntilMs = 0;  // the hold a rise of that count started ends here
+    bool eventHolding = false;      // the director holds for an event right now
+    bool saidStuck = false;         // the stuck count was logged for this stretch
 };
 State g;
 
@@ -122,6 +130,7 @@ struct Obs {
     bool joining = false;
     bool anyResting = false;
     int activeEvents = 0;
+    std::string eventNames;  // the classes holding that count, up to three, for the pane and the log
     float apartM = 0.f;  // the largest distance between two living players
     Seen p[coop::players::kMaxPeers];
     int n = 0;
@@ -142,6 +151,21 @@ Obs Observe(coop::net::Session& s) {
     o.dusk = o.hour >= 18 && o.hour < 20;
     int32_t events = 0;
     if (ue_wrap::active_events::EnsureResolved() && ue_wrap::active_events::ReadCount(events)) o.activeEvents = events;
+    ue_wrap::active_events::Senders senders{};
+    if (o.activeEvents > 0 && ue_wrap::active_events::ReadSenders(senders) && senders.data) {
+        int named = 0;
+        for (int32_t i = 0; i < senders.num && i < 64 && named < 3; ++i) {
+            void* obj = senders.data[i];
+            if (!obj || !ue_wrap::reflection::IsLive(obj)) continue;
+            const std::wstring w = ue_wrap::reflection::ToString(ue_wrap::reflection::NameOf(ue_wrap::reflection::ClassOf(obj)));
+            std::string n;
+            for (wchar_t c : w) n.push_back((c > 0 && c < 128) ? static_cast<char>(c) : '?');
+            if (o.eventNames.find(n) != std::string::npos) continue;
+            if (!o.eventNames.empty()) o.eventNames += ", ";
+            o.eventNames += n;
+            ++named;
+        }
+    }
 
     auto& reg = coop::players::Registry::Get();
     for (int slot = 0; slot < static_cast<int>(coop::players::kMaxPeers); ++slot) {
@@ -301,7 +325,7 @@ std::string Situation(const Obs& o, uint64_t now) {
     j["threshold"] = static_cast<int>(g.threshold);
     j["peak"] = g.tension >= g.threshold;
     j["relaxing"] = now < g.relaxUntilMs;
-    j["event_running"] = o.activeEvents > 0;
+    j["event_running"] = g.eventHolding;
     json players = json::array();
     for (int i = 0; i < o.n; ++i) {
         const Seen& p = o.p[i];
@@ -389,11 +413,30 @@ void TakeAnswer(const Obs& o, bool holding, uint64_t now) {
 }
 
 // ---- the tick --------------------------------------------------------------------------------------
+// The game's own events: a rise in their count holds the director for kEventHoldMs; a count that stays up
+// past that is taken as stuck (said once) and holds nothing until it rises again.
+void TrackEvents(const Obs& o, uint64_t now) {
+    if (o.activeEvents > g.eventsLast) {
+        g.eventHoldUntilMs = now + kEventHoldMs;
+        g.saidStuck = false;
+    }
+    g.eventsLast = o.activeEvents;
+    g.eventHolding = o.activeEvents > 0 && now < g.eventHoldUntilMs;
+    if (o.activeEvents > 0 && !g.eventHolding && !g.saidStuck) {
+        g.saidStuck = true;
+        UE_LOGI("director: the game's event count has stayed at %d for %llu s (%s) -- taken as stuck; the "
+                "director goes on until it rises again", o.activeEvents,
+                static_cast<unsigned long long>(kEventHoldMs / 1000), o.eventNames.c_str());
+    }
+}
+
 std::string HoldReason(const Obs& o) {
     if (!o.gameplay) return "the world is loading";
     if (o.joining) return "a player is joining";
     if (o.anyResting && CFG::ResolveFlag(CR::rows::director_respect_sleep)) return "someone is asleep";
-    if (o.activeEvents > 0) return "one of the game's own events is running";
+    if (g.eventHolding)
+        return o.eventNames.empty() ? std::string("one of the game's own events is running")
+                                    : "one of the game's own events is running (" + o.eventNames + ")";
     return std::string();
 }
 
@@ -427,6 +470,7 @@ void Step(coop::net::Session& s, uint64_t now) {
     const float dt = g.lastTickMs ? std::min(5.f, static_cast<float>(now - g.lastTickMs) / 1000.f) : 1.f;
     g.lastTickMs = now;
     const Obs o = Observe(s);
+    TrackEvents(o, now);
     g.hold = HoldReason(o);
     const bool holding = !g.hold.empty();
 

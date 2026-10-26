@@ -22,7 +22,9 @@ drops the tension by 35 to 65 depending on the scare's power, rolls a new thresh
 90 and holds a breather of one and a half to three minutes (shorter at higher intensity). It holds
 while a player joins, while anyone is in bed (`director.respect_sleep`; one of the game's events
 wakes a sleeper) and while one of the game's own events runs, so it never stacks on a story beat
-(`coop/fear/fear_director`).
+(`coop/fear/fear_director`). That last hold lasts three minutes from the rise of the game's event count:
+some event actors keep their registration for the whole session, and a count that never falls is taken
+as stuck (logged once, with the classes holding it) rather than silencing the night.
 
 ### What it may fire
 

@@ -11,7 +11,8 @@
 // Authority: the host's alone, like every shared-world roll. A client runs none of this; what it sees
 // arrives through the lane that carries each scare (the catalog names it). The director holds while a
 // player is still joining, while anyone sleeps (director.respect_sleep), and while one of the game's
-// own events is running, so it never stacks on a story beat.
+// own events is running, so it never stacks on a story beat (for three minutes after the game's event count
+// rises; a count that stays up longer is taken as stuck, so a lingering event does not silence the night).
 //
 // With director.ai on, an AI agent (coop/fear/fear_ai.h) looks at the same situation every
 // director.ai_period_s seconds and chooses instead of the dice: which scare, whether to wait, and an
@@ -45,7 +46,7 @@ struct View {
     float tension = 0.f;       // 0..100
     float threshold = 0.f;     // the next scare's trigger point
     int relaxLeftS = 0;        // seconds of breather left after the last scare
-    char hold[112] = {};       // why it is holding right now, empty when it is not
+    char hold[200] = {};       // why it is holding right now, empty when it is not
     bool aiOn = false;         // director.ai and a key in hand
     char aiState[112] = {};    // the agent's last outcome, for the host
     char aiNote[240] = {};     // the agent's own last sentence about its plan
